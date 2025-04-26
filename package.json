@@ -1,0 +1,38 @@
+{
+  "name": "gridlords",
+  "version": "1.0.0",
+  "description": "Gridlords — a minimalist turn-based strategy war game for the terminal, featuring PvP and AI (Gemini) modes.",
+  "main": "dist/gridlords.js",
+  "bin": {
+    "gridlords": "dist/gridlords.js"
+  },
+  "scripts": {
+    "dev": "tsx gridlords.ts",
+    "build": "tsc",
+    "start": "node dist/gridlords.js",
+    "prepare": "npm run build",
+    "test": "echo \"No tests yet — the battlefield doesn't wait.\" && exit 0"
+  },
+  "keywords": [
+    "strategy",
+    "terminal",
+    "ascii",
+    "game",
+    "typescript",
+    "nodejs",
+    "cli",
+    "ai",
+    "pvp",
+    "pve",
+    "gridlords",
+    "turn-based",
+    "gemini"
+  ],
+  "author": "Felipão, Supreme Lord of the Grid",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}

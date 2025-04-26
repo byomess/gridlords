@@ -1,0 +1,26 @@
+# Node.js
+node_modules/
+dist/
+
+# Dependency Lockfiles (opcional, se quiser ignorar lockfile específico)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.*
+
+# Editor folders
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# TypeScript build artifacts (caso gere isoladamente)
+*.tsbuildinfo

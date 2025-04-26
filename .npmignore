@@ -1,0 +1,37 @@
+# Ignore source code
+src/
+
+# Ignore build configs
+tsconfig.json
+tsx.config.js
+.eslintrc.json
+.prettierrc
+
+# Ignore locks and node_modules
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Ignore editor settings
+.vscode/
+.idea/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore TypeScript build info
+*.tsbuildinfo
+
+# Ignore test files (if you ever add)
+tests/
+__tests__/
+
+# Ignore misc
+.env
+.env.*
+.gitignore
