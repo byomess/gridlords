@@ -1,13 +1,13 @@
 {
   "name": "gridlords",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Gridlords — a minimalist turn-based strategy war game for the terminal, featuring PvP and AI (Gemini) modes.",
   "main": "dist/gridlords.js",
   "bin": {
     "gridlords": "dist/gridlords.js"
   },
   "scripts": {
-    "dev": "tsx gridlords.ts",
+    "dev": "tsx src/gridlords.ts",
     "build": "tsc",
     "start": "node dist/gridlords.js",
     "prepare": "npm run build",
