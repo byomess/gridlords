@@ -4,68 +4,83 @@ import readline from 'readline';
 
 function displayHelp(): void {
     console.log(`
-GRIDLORDS - Game Manual
-=======================
+   ██████╗ ██████╗ ██╗██████╗ ██╗      ██████╗ ██████╗ ██████╗ ███████╗
+  ██╔════╝ ██╔══██╗██║██╔══██╗██║     ██╔═══██╗██╔══██╗██╔══██╗██╔════╝
+  ██║  ███╗██████╔╝██║██║  ██║██║     ██║   ██║██████╔╝██║  ██║███████╗
+  ██║   ██║██╔══██╗██║██║  ██║██║     ██║   ██║██╔══██╗██║  ██║╚════██║
+  ╚██████╔╝██║  ██║██║██████╔╝███████╗╚██████╔╝██║  ██║██████╔╝███████║
+   ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚══════╝
 
-Objective:
-----------
-Be the first player to conquer and control ${GameConstants.VICTORY_CONDITION_CELLS} cells on the ${GameConstants.GRID_SIZE}x${GameConstants.GRID_SIZE} board to become the Supreme Grid Lord!
-
-Basic Gameplay:
----------------
-- The game is turn-based between two players (Player X and Player O).
-- On each turn, the current player performs ONE action.
-- The board is a grid. Cells are identified by Letter (Row) and Number (Column), like A1, C3, E5.
-
-Available Actions (Enter ACTION COORDINATE):
--------------------------------------------
-1. CONQUER [CELL] (Ex: C B3)
-   - Target: An EMPTY cell (' ') that is ADJACENT (not diagonally) to a cell you already control.
-   - Effect: You take control of the target cell. Your mark (X or O) appears on it.
-   - Restrictions: You cannot conquer cells containing special items like ⚡ (Power) or ✶ (Magic). Cells with ⛨ (Shield) also cannot be conquered directly while the shield is active (they can only be attacked if occupied by the enemy).
-
-2. FORTIFY [CELL] (Ex: F A1)
-   - Target: A cell that YOU ALREADY CONTROL.
-   - Effect: Adds a Shield (⛨) to the cell. If the cell already contained ⚡ or ✶, those items are REMOVED.
-   - Benefit: Cells with ⛨ receive a +${GameConstants.SHIELD_DEFENSE_MODIFIER} bonus to their defense roll when attacked.
-   - Restrictions: You cannot fortify a cell that already has a ⛨.
-
-3. ATTACK [CELL] (Ex: A D4)
-   - Target: A cell controlled by the ENEMY that is ADJACENT to a cell you control.
-   - Mechanism:
-     - Both players roll a 6-sided die (D6) (${GameConstants.MIN_DICE_ROLL}-${GameConstants.MAX_DICE_ROLL}).
-     - The Defender receives +${GameConstants.SHIELD_DEFENSE_MODIFIER} to their roll if the attacked cell has a Shield (⛨).
-     - If the Attacker's roll is STRICTLY GREATER than the Defender's (modified) roll, the attack succeeds.
-   - Effect (Success): You capture the enemy cell. Your mark replaces the enemy's. If there was a ⛨ on the cell, it is DESTROYED. If there were ⚡ or ✶, they are removed (captured, but effect not yet implemented).
-   - Effect (Failure): Nothing happens. The cell remains under the defender's control.
-
-Special Items:
---------------
-- ⚡ (Power), ✶ (Magic): Appear initially on the board. When conquering/attacking a cell with them, a message is displayed, but they currently have no mechanical effects other than being removed. Cannot be conquered directly.
-- ⛨ (Shield): Added by the FORTIFY action or may appear initially. Grants a defense bonus (+${GameConstants.SHIELD_DEFENSE_MODIFIER}). It is destroyed if the cell is captured by an attack.
-
-Game Modes:
------------
-- PvP (Player vs Player): Two humans play on the same terminal.
-- PvE (Player vs AI): You play against the Google Gemini AI (requires configuring the GEMINI_API_KEY environment variable).
-
-Controls (New Format!):
------------------------
-- During your turn, enter the desired ACTION (C for CONQUER, F for FORTIFY, A for ATTACK) followed by the target COORDINATE (LetterNumber), separated by a space. Examples:
-  - C B3
-  - A E4
-  - F A1
-- Coordinates use Row Letter (A-${String.fromCharCode(GameConstants.ASCII_A_OFFSET + GameConstants.GRID_SIZE - 1)}) and Column Number (1-${GameConstants.GRID_SIZE}). Case-insensitive (will be converted to uppercase).
-
-Command Line Options:
----------------------
-- Use '--help' or '-h' when starting the game to display this manual.
-  (Ex: node your_compiled_file.js --help)
-
-Good luck, Grid Lord!
-`);
+  
+  GRIDLORDS - GAME MANUAL
+  ===========================================
+  
+  Objective:
+  -----------
+  Conquer and control ${GameConstants.VICTORY_CONDITION_CELLS} cells on a ${GameConstants.GRID_SIZE}x${GameConstants.GRID_SIZE} grid.  
+  Become the one and only Supreme Grid Lord.
+  
+  Gameplay Basics:
+  ----------------
+  - Turn-based battle: Player X vs Player O.
+  - On each turn, you perform ONE action: Conquer, Fortify, or Attack.
+  - The board uses Row Letters (A-E) and Column Numbers (1-5), ex: A1, C3, E5.
+  
+  Actions:
+  --------
+  1. **Conquer [CELL]** (Ex: C B3)
+     - Target an EMPTY cell (' ') adjacent (horizontally or vertically) to your territory.
+     - You cannot conquer special item cells (⚡ ✶) directly.
+     - Cells fortified with a Shield (⛨) must be attacked, not conquered.
+  
+  2. **Fortify [CELL]** (Ex: F A1)
+     - Fortify a cell you already control.
+     - Adds a Shield (⛨), granting +${GameConstants.SHIELD_DEFENSE_MODIFIER} defense bonus.
+     - Removes ⚡ and ✶ if present on the fortified cell.
+     - Cannot fortify if the cell already has a Shield.
+  
+  3. **Attack [CELL]** (Ex: A D4)
+     - Attack an enemy-controlled adjacent cell.
+     - Roll a six-sided die (1-${GameConstants.MAX_DICE_ROLL}) for both attacker and defender.
+     - Defender adds +${GameConstants.SHIELD_DEFENSE_MODIFIER} if the cell has a Shield (⛨).
+     - If attacker's roll > defender's roll, the attack succeeds:
+       - You capture the cell.
+       - Any Shield (⛨) is destroyed.
+       - Any ⚡ or ✶ is captured (no special effect yet).
+     - If the attack fails, the cell remains enemy-controlled.
+  
+  Special Items:
+  --------------
+  - **⚡ Power Source**: Unimplemented future effects.
+  - **✶ Magic Well**: Unimplemented future effects.
+  - **⛨ Shield**: Fortifies a cell with +${GameConstants.SHIELD_DEFENSE_MODIFIER} defense bonus.
+  
+  Game Modes:
+  -----------
+  - **PvP (Player vs Player)**: Human vs Human.
+  - **PvE (Player vs AI)**: Battle against a Gemini-powered AI (set your GEMINI_API_KEY to enable).
+  
+  Controls:
+  ---------
+  - During your turn, input the action and target coordinate, separated by a space:
+    - C B3 — Conquer B3
+    - F A1 — Fortify A1
+    - A E4 — Attack E4
+  - Input is case-insensitive and automatically capitalized.
+  
+  Command Line Options:
+  ---------------------
+  - Run with '--help' or '-h' to display this manual.
+    (Ex: npx gridlords -h)
+  
+  ---
+  
+  Good luck, Grid Lord.
+  Command. Conquer. Survive.
+  
+  `);
     process.exit(0);
-}
+}  
 
 namespace GameConstants {
     export const GRID_SIZE: number = 5;
