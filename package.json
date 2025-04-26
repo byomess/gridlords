@@ -1,7 +1,7 @@
 {
   "name": "gridlords",
   "version": "1.0.4",
-  "description": "Gridlords — a minimalist turn-based strategy war game for the terminal, featuring PvP and AI (Gemini) modes.",
+  "description": "Gridlords — a brutal minimalist turn-based strategy war game for the terminal, featuring PvP and AI (Gemini) modes.",
   "main": "dist/gridlords.js",
   "bin": {
     "gridlords": "dist/gridlords.js"
@@ -11,25 +11,44 @@
     "build": "tsc",
     "start": "node dist/gridlords.js",
     "prepare": "npm run build",
+    "prepublishOnly": "npm test",
     "test": "echo \"No tests yet — the battlefield doesn't wait.\" && exit 0"
   },
   "keywords": [
     "strategy",
     "terminal",
     "ascii",
+    "cli",
     "game",
     "typescript",
     "nodejs",
-    "cli",
     "ai",
     "pvp",
     "pve",
+    "grid",
     "gridlords",
     "turn-based",
-    "gemini"
+    "gemini",
+    "tactical",
+    "battle"
   ],
-  "author": "byomess <byomess@proton.me> (https://github.com/byomess)",
+  "author": {
+    "name": "byomess",
+    "email": "byomess@proton.me",
+    "url": "https://github.com/byomess"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byomess/gridlords.git"
+  },
+  "bugs": {
+    "url": "https://github.com/byomess/gridlords/issues"
+  },
+  "homepage": "https://github.com/byomess/gridlords#readme",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/node": "^22.15.2",
     "tsx": "^4.19.3",
