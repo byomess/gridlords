@@ -1,6 +1,6 @@
 {
   "name": "gridlords",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Gridlords — a minimalist turn-based strategy war game for the terminal, featuring PvP and AI (Gemini) modes.",
   "main": "dist/gridlords.js",
   "bin": {
@@ -28,7 +28,7 @@
     "turn-based",
     "gemini"
   ],
-  "author": "Felipão, Supreme Lord of the Grid",
+  "author": "byomess <byomess@proton.me> (https://github.com/byomess)",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.15.2",
