@@ -2,7 +2,6 @@
 
 import readline from 'readline';
 
-// Simplified Help for token saving
 function displayHelp(): void {
     console.log(`
    ██████╗ ██████╗ ██╗██████╗ ██╗      ██████╗ ██████╗ ██████╗ ███████╗
@@ -12,34 +11,34 @@ function displayHelp(): void {
   ╚██████╔╝██║  ██║██║██████╔╝███████╗╚██████╔╝██║  ██║██████╔╝███████║
    ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚══════╝
 
-  
+
   GRIDLORDS - GAME MANUAL
   ===========================================
-  
+
   Objective:
   -----------
-  Conquer and control ${GameConstants.VICTORY_CONDITION_CELLS} cells on a ${GameConstants.GRID_SIZE}x${GameConstants.GRID_SIZE} grid.  
+  Conquer and control ${GameConstants.VICTORY_CONDITION_CELLS} cells on a ${GameConstants.GRID_SIZE}x${GameConstants.GRID_SIZE} grid.
   Become the one and only Supreme Grid Lord.
-  
+
   Gameplay Basics:
   ----------------
   - Turn-based battle: Player X vs Player O.
   - On each turn, you perform ONE action: Conquer, Fortify, or Attack.
   - The board uses Row Letters (A-E) and Column Numbers (1-5), ex: A1, C3, E5.
-  
+
   Actions:
   --------
   1. **Conquer [CELL]** (Ex: C B3)
      - Target an EMPTY cell (' ') adjacent (horizontally or vertically) to your territory.
      - If the empty cell contains a Shield (⛨), you conquer the cell AND keep the shield.
      - You cannot conquer cells with initial Power Sources (∆) or Magic Wells (✶) directly (these must be captured via attack if owned by enemy, or maybe special actions later).
-  
+
   2. **Fortify [CELL]** (Ex: F A1)
      - Fortify a cell you already control.
      - Adds a Shield (⛨), granting +${GameConstants.SHIELD_DEFENSE_MODIFIER} defense bonus.
      - Removes ∆ and ✶ if present on the fortified cell.
      - Cannot fortify if the cell already has a Shield.
-  
+
   3. **Attack [CELL]** (Ex: A D4)
      - Attack an enemy-controlled adjacent cell.
      - Roll a six-sided die (1-${GameConstants.MAX_DICE_ROLL}) for both attacker and defender.
@@ -49,18 +48,18 @@ function displayHelp(): void {
        - Any Shield (⛨) is destroyed.
        - Any ∆ or ✶ is captured (no special effect yet).
      - If the attack fails, the cell remains enemy-controlled.
-  
+
   Special Items:
   --------------
   - **∆ Power Source**: Unimplemented future effects.
   - **✶ Magic Well**: Unimplemented future effects.
   - **⛨ Shield**: Fortifies a cell with +${GameConstants.SHIELD_DEFENSE_MODIFIER} defense bonus.
-  
+
   Game Modes:
   -----------
   - **PvP (Player vs Player)**: Human vs Human.
   - **PvE (Player vs AI)**: Battle against a Gemini-powered AI (set your GEMINI_API_KEY to enable).
-  
+
   Controls:
   ---------
   - During your turn, input the action and target coordinate, separated by a space:
@@ -68,17 +67,17 @@ function displayHelp(): void {
     - F A1 — Fortify A1
     - A E4 — Attack E4
   - Input is case-insensitive and automatically capitalized.
-  
+
   Command Line Options:
   ---------------------
   - Run with '--help' or '-h' to display this manual.
     (Ex: npx gridlords -h)
-  
+
   ---
-  
+
   Good luck, Grid Lord.
   Command. Conquer. Survive.
-  
+
   `);
     process.exit(0);
 }
@@ -99,9 +98,8 @@ namespace GameConstants {
     export const ASCII_A_OFFSET: number = 65;
 
     export const GEMINI_API_KEY: string | undefined = process.env.GEMINI_API_KEY;
-    // Use a known working model, adjust if needed
     export const GEMINI_API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent`;
-    export const AI_REQUEST_TIMEOUT_MS = 20000; // Increased timeout
+    export const AI_REQUEST_TIMEOUT_MS = 20000;
     export const AI_MAX_RETRIES = 2;
 }
 
@@ -110,7 +108,7 @@ namespace GameTypes {
     export type PlayerMark = typeof GameConstants.PLAYER_MARKS[number];
     export type SpecialType = typeof GameConstants.SPECIAL_TYPES[number];
     export type EmptyCell = ' ';
-    export type CellState = EmptyCell | PlayerMark; // Specials are tracked separately now
+    export type CellState = EmptyCell | PlayerMark;
     export type CoordinateString = `${number},${number}`;
     export type GameMode = 'PvP' | 'PvE';
 
@@ -131,7 +129,7 @@ namespace GameTypes {
     export interface AIMove {
         action: AIActionType;
         coord: Coordinate;
-        magicWellTargetCoord?: Coordinate; // Optional: For AI's ✶ choice
+        magicWellTargetCoord?: Coordinate;
     }
 
     export interface AIParsedResponse {
@@ -165,7 +163,7 @@ namespace GameInterfaces {
         ownsAnyMagicWell(): boolean;
         addMagicWell(coordStr: GameTypes.CoordinateString): void;
         removeMagicWell(coordStr: GameTypes.CoordinateString): void;
-        getMagicWells(): ReadonlySet<GameTypes.CoordinateString>; // Needed for AI prompt
+        getMagicWells(): ReadonlySet<GameTypes.CoordinateString>;
     }
 
     export interface IGameRules {
@@ -173,10 +171,10 @@ namespace GameInterfaces {
         checkWinner(players: readonly [IPlayer, IPlayer]): GameTypes.PlayerId | null;
         rollAttackDice(attackerPlayer: IPlayer): number;
         rollDefenseDice(
-            defendingPlayer: IPlayer, // Added
-            defendedCoord: GameTypes.Coordinate, // Added
+            defendingPlayer: IPlayer,
+            defendedCoord: GameTypes.Coordinate,
             isShielded: boolean,
-            activeMagicWellBonusTarget: GameTypes.CoordinateString | null // Added
+            activeMagicWellBonusTarget: GameTypes.CoordinateString | null
         ): number;
         getValidMoves(player: IPlayer, opponent: IPlayer, grid: IGrid, specials: GameTypes.SpecialCellsMap): GameTypes.AIMove[];
         getValidMagicWellTargets(player: IPlayer): GameTypes.Coordinate[];
@@ -189,9 +187,9 @@ namespace GameInterfaces {
         askQuestion(prompt: string): Promise<string>;
         promptGameMode(): Promise<GameTypes.GameMode>;
         promptPlayerMove(playerName: GameTypes.PlayerMark): Promise<GameTypes.PlayerMoveInput | null>;
-        promptMagicWellTarget(player: GameInterfaces.IPlayer, validTargets: GameTypes.Coordinate[]): Promise<GameTypes.Coordinate | null>; // Added
+        promptMagicWellTarget(player: GameInterfaces.IPlayer, validTargets: GameTypes.Coordinate[]): Promise<GameTypes.Coordinate | null>;
         displayAttackResult(attackerMark: GameTypes.PlayerMark, defenderMark: GameTypes.PlayerMark, attackRoll: number, defenseRoll: number, success: boolean): void;
-        displayAIMove(aiMark: GameTypes.PlayerMark, move: GameTypes.AIMove): void; // Adjusted to take AIMove
+        displayAIMove(aiMark: GameTypes.PlayerMark, move: GameTypes.AIMove): void;
         displayAIThinking(): void;
         displayAIError(errorMsg: string): void;
         displayVictory(winnerMark: GameTypes.PlayerMark | null): void;
@@ -205,7 +203,7 @@ namespace GameInterfaces {
             grid: IGrid,
             specials: GameTypes.SpecialCellsMap,
             rules: IGameRules
-        ): Promise<GameTypes.AIMove | null>; // Return AIMove potentially with target
+        ): Promise<GameTypes.AIMove | null>;
     }
 
     export interface IGameController {
@@ -231,7 +229,6 @@ namespace GameUtils {
 
     export function parseCoordinateInput(input: string): GameTypes.Coordinate | null {
         const sanitizedInput = input.trim().toUpperCase();
-        // Allow optional space, require letter first then number
         const match = sanitizedInput.match(/^([A-Z])\s?([1-9]\d*)$/);
 
         if (!match) {
@@ -247,7 +244,6 @@ namespace GameUtils {
         if (row < 0 || row >= GameConstants.GRID_SIZE || col < 0 || col >= GameConstants.GRID_SIZE) {
              const maxRowChar = String.fromCharCode(GameConstants.ASCII_A_OFFSET + GameConstants.GRID_SIZE - 1);
              const maxCol = GameConstants.GRID_SIZE;
-             // Avoid console.error here, let the caller handle UI message
             return null;
         }
 
@@ -316,14 +312,14 @@ namespace Core {
         public readonly mark: GameTypes.PlayerMark;
         private readonly positions: Set<GameTypes.CoordinateString>;
         private readonly ownedPowerSources: Set<GameTypes.CoordinateString>;
-        private readonly ownedMagicWells: Set<GameTypes.CoordinateString>; // Added
+        private readonly ownedMagicWells: Set<GameTypes.CoordinateString>;
 
         constructor(id: GameTypes.PlayerId) {
             this.id = id;
             this.mark = GameConstants.PLAYER_MARKS[id];
             this.positions = new Set();
             this.ownedPowerSources = new Set();
-            this.ownedMagicWells = new Set(); // Initialize
+            this.ownedMagicWells = new Set();
         }
 
         public addPosition(coordStr: GameTypes.CoordinateString): void {
@@ -332,8 +328,8 @@ namespace Core {
 
         public removePosition(coordStr: GameTypes.CoordinateString): void {
             this.positions.delete(coordStr);
-            this.removePowerSource(coordStr); // Clean up if lost
-            this.removeMagicWell(coordStr);   // Clean up if lost
+            this.removePowerSource(coordStr);
+            this.removeMagicWell(coordStr);
         }
 
         public ownsPosition(coordStr: GameTypes.CoordinateString): boolean {
@@ -348,7 +344,6 @@ namespace Core {
             return this.positions.size;
         }
 
-        // --- Power Source ---
         public ownsAnyPowerSource(): boolean {
             return this.ownedPowerSources.size > 0;
         }
@@ -361,7 +356,6 @@ namespace Core {
             this.ownedPowerSources.delete(coordStr);
         }
 
-        // --- Magic Well ---
         public ownsAnyMagicWell(): boolean {
             return this.ownedMagicWells.size > 0;
         }
@@ -399,14 +393,12 @@ namespace Rules {
                     return player.id;
                 }
             }
-            // Add check for no more valid moves (stalemate potential) - Future enhancement maybe
             return null;
         }
 
         public rollAttackDice(attackerPlayer: GameInterfaces.IPlayer): number {
             const baseRoll = GameUtils.randomInt(GameConstants.MIN_DICE_ROLL, GameConstants.MAX_DICE_ROLL);
             const powerBonus = attackerPlayer.ownsAnyPowerSource() ? GameConstants.POWER_SOURCE_ATTACK_BONUS : 0;
-            // Display message moved to UI.displayAttackResult for cleaner separation
             return baseRoll + powerBonus;
         }
 
@@ -421,7 +413,6 @@ namespace Rules {
             const defendedCoordStr = GameUtils.toCoordinateString(defendedCoord);
             const magicBonus = (activeMagicWellBonusTarget === defendedCoordStr) ? GameConstants.MAGIC_WELL_DEFENSE_BONUS : 0;
 
-            // Display messages moved to UI.displayAttackResult
             return baseRoll + shieldBonus + magicBonus;
         }
 
@@ -429,13 +420,12 @@ namespace Rules {
             return r >= 0 && r < gridSize && c >= 0 && c < gridSize;
         }
 
-        // Get moves AI can consider (also used for fallback)
         public getValidMoves(
             player: GameInterfaces.IPlayer,
             opponent: GameInterfaces.IPlayer,
             grid: GameInterfaces.IGrid,
-            specials: GameTypes.SpecialCellsMap): GameTypes.AIMove[]
-        {
+            specials: GameTypes.SpecialCellsMap
+        ): GameTypes.AIMove[] {
             const validMoves: GameTypes.AIMove[] = [];
             const gridSize = grid.getSize();
             const playerPositions = player.getPositions();
@@ -444,12 +434,10 @@ namespace Rules {
                 const ownedCoord = GameUtils.fromCoordinateString(posStr);
                 const deltas = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
-                // Fortify Check (can fortify own cell if not already shielded)
                 if (specials[posStr] !== '⛨') {
                     validMoves.push({ action: 'FORTIFY', coord: ownedCoord });
                 }
 
-                // Adjacent Cell Checks (Conquer/Attack)
                 for (const [dr, dc] of deltas) {
                     const targetRow = ownedCoord.row + dr;
                     const targetCol = ownedCoord.col + dc;
@@ -458,31 +446,23 @@ namespace Rules {
                     if (this.isValid(targetRow, targetCol, gridSize)) {
                         const targetCoordStr = GameUtils.toCoordinateString(targetCoord);
                         const cellState = grid.getCell(targetCoord);
-                        const specialAtTarget = specials[targetCoordStr];
 
-                        // Conquer: Target must be empty
                         if (cellState === ' ') {
-                           // Cannot conquer initial ∆ or ✶ directly (rule clarification needed if they can appear empty later?)
-                           // Let's assume Conquer only works on truly empty OR empty-with-shield cells for now.
-                           if (!specialAtTarget || specialAtTarget === '⛨') {
-                                validMoves.push({ action: 'CONQUER', coord: targetCoord });
-                           }
+                            validMoves.push({ action: 'CONQUER', coord: targetCoord });
                         }
-                        // Attack: Target must belong to opponent
                         else if (opponent.ownsPosition(targetCoordStr)) {
-                             validMoves.push({ action: 'ATTACK', coord: targetCoord });
+                            validMoves.push({ action: 'ATTACK', coord: targetCoord });
                         }
                     }
                 }
             }
 
-            // Deduplicate (important as multiple owned cells can enable same target)
             const uniqueMoves = new Map<string, GameTypes.AIMove>();
-            for(const move of validMoves) {
-                 const key = `${move.action}:${GameUtils.toCoordinateString(move.coord)}`;
-                 if (!uniqueMoves.has(key)) {
-                     uniqueMoves.set(key, move);
-                 }
+            for (const move of validMoves) {
+                const key = `${move.action}:${GameUtils.toCoordinateString(move.coord)}`;
+                if (!uniqueMoves.has(key)) {
+                    uniqueMoves.set(key, move);
+                }
             }
 
             return Array.from(uniqueMoves.values());
@@ -515,7 +495,6 @@ namespace UI {
         }
 
         public clearScreen(): void {
-            // console.clear();
             console.log('\n');
         }
 
@@ -621,7 +600,6 @@ namespace UI {
 
                 const coord = GameUtils.parseCoordinateInput(coordStr);
                 if (!coord) {
-                    // Check if it was just an invalid coordinate format
                     if (coordStr.match(/^[A-Z][1-9]\d*$/i)) {
                          const maxRowChar = String.fromCharCode(GameConstants.ASCII_A_OFFSET + GameConstants.GRID_SIZE - 1);
                          const maxCol = GameConstants.GRID_SIZE;
@@ -676,11 +654,8 @@ namespace UI {
             defenseRoll: number,
             success: boolean): void
         {
-            // Detailed breakdown including bonuses can be added here if desired
             this.displayMessage(`--- Attack ${attackerMark} vs ${defenderMark} ---`);
             this.displayMessage(`  Rolls: Attacker (${attackerMark}) = ${attackRoll} | Defender (${defenderMark}) = ${defenseRoll}`);
-             // Explain bonuses here based on game state (passed in or inferred) - requires more params
-             // Example: console.log(`   (Attacker +1 from ∆, Defender +1 from ⛨, +1 from ✶)`)
             if (success) {
                 this.displayMessage(`  Result: ATTACK SUCCESSFUL!`);
             } else {
@@ -718,7 +693,7 @@ namespace UI {
              if (winnerMark) {
                  this.displayMessage(`      GAME OVER! Player ${winnerMark} is the SUPREME GRID LORD!!!`);
              } else {
-                 this.displayMessage(`      GAME OVER! Draw or Stalemate!`); // Or handle other end conditions
+                 this.displayMessage(`      GAME OVER! Draw or Stalemate!`);
              }
              this.displayMessage("==============================================\n");
         }
@@ -740,9 +715,6 @@ namespace AI {
             this.apiKey = apiKey;
         }
 
-        // Simplified Prompt for token saving
-        // Inside namespace AI, class GeminiAI
-
         private formatGameStateForPrompt(
             aiPlayer: GameInterfaces.IPlayer,
             humanPlayer: GameInterfaces.IPlayer,
@@ -758,7 +730,6 @@ namespace AI {
 
             for (let r = 0; r < gridSize; r++) {
                 const rowLetter = String.fromCharCode(GameConstants.ASCII_A_OFFSET + r);
-                // Initialize rowLine here for each row
                 let rowLine = `${rowLetter} |`;
                 for (let c = 0; c < gridSize; c++) {
                     const coord: GameTypes.Coordinate = { row: r, col: c };
@@ -766,10 +737,9 @@ namespace AI {
                     const special = specials[coordStr];
                     const cell = grid.getCell(coord);
                     const displayChar: string = special ?? cell;
-                    // Use rowLine to build the string for the current row
                     rowLine += ` ${displayChar.padEnd(1)} |`;
                 }
-                // Append the completed rowLine to the main boardString
+
                 boardString += rowLine + "\n";
                 boardString += '  +' + '---+'.repeat(gridSize) + '\n';
             }
@@ -777,7 +747,7 @@ namespace AI {
             const aiPositions = Array.from(aiPlayer.getPositions()).map(cs => GameUtils.formatCoordForUser(GameUtils.fromCoordinateString(cs))).join(', ') || 'None';
             const humanPositions = Array.from(humanPlayer.getPositions()).map(cs => GameUtils.formatCoordForUser(GameUtils.fromCoordinateString(cs))).join(', ') || 'None';
             const aiMagicWells = Array.from(aiPlayer.getMagicWells()).map(cs => GameUtils.formatCoordForUser(GameUtils.fromCoordinateString(cs))).join(', ') || 'None';
-            const validMagicWellTargets = rules.getValidMagicWellTargets(aiPlayer).map(GameUtils.formatCoordForUser).join(', ') || 'None available'; // Adjusted message
+            const validMagicWellTargets = rules.getValidMagicWellTargets(aiPlayer).map(GameUtils.formatCoordForUser).join(', ') || 'None available';
             const specialLocations = Object.entries(specials)
                     .map(([coordStr, type]) => `${GameUtils.formatCoordForUser(GameUtils.fromCoordinateString(coordStr as GameTypes.CoordinateString))}(${type})`)
                     .join(', ') || 'None';
@@ -788,7 +758,7 @@ namespace AI {
 
         Current Board State:
         ${boardString}
-        Legend: [ ]=Empty, X, O = Players, ⚡=Power, ✶=MagicWell, ⛨=Shield
+        Legend: [ ]=Empty, X, O = Players, ∆=Power, ✶=MagicWell, ⛨=Shield
 
         Your Cells (${aiPlayer.getPositionCount()}): ${aiPositions}
         Opponent (${humanPlayer.mark}) Cells (${humanPlayer.getPositionCount()}): ${humanPositions}
@@ -800,11 +770,11 @@ namespace AI {
         - Adjacency: CONQUER/ATTACK target MUST be adjacent (up/down/left/right) to one of YOUR cells (${aiPlayer.mark}).
         - CONQUER: Target an EMPTY cell (' ') adjacent to YOUR territory. Empty means the cell shows ' ' on the board.
             - If the empty cell has a ⛨, you capture the cell AND the ⛨ remains.
-            - If the empty cell has ⚡ or ✶, you capture it.
-        - FORTIFY: Target YOUR OWN cell (${aiPlayer.mark}) without a ⛨. Adds ⛨. Removes existing ⚡ or ✶ from the cell and your control.
+            - If the empty cell has ∆ or ✶, you capture it.
+        - FORTIFY: Target YOUR OWN cell (${aiPlayer.mark}) without a ⛨. Adds ⛨. Removes existing ∆ or ✶ from the cell and your control.
         - ATTACK: Target an OPPONENT'S cell (${humanPlayer.mark}) adjacent to YOUR territory.
-            - Roll dice: Attacker (+${GameConstants.POWER_SOURCE_ATTACK_BONUS} if owns any ⚡) vs Defender (+${GameConstants.SHIELD_DEFENSE_MODIFIER} if cell has ⛨, +${GameConstants.MAGIC_WELL_DEFENSE_BONUS} if targeted by active ✶ effect).
-            - Win: Capture cell, DESTROY ⛨ if present, CAPTURE ⚡ or ✶ if present.
+            - Roll dice: Attacker (+${GameConstants.POWER_SOURCE_ATTACK_BONUS} if owns any ∆) vs Defender (+${GameConstants.SHIELD_DEFENSE_MODIFIER} if cell has ⛨, +${GameConstants.MAGIC_WELL_DEFENSE_BONUS} if targeted by active ✶ effect).
+            - Win: Capture cell, DESTROY ⛨ if present, CAPTURE ∆ or ✶ if present.
         - Magic Well Bonus (✶): If you own any ✶, after your main action, choose ONE of YOUR cells (${validMagicWellTargets}) to get +${GameConstants.MAGIC_WELL_DEFENSE_BONUS} defense on opponent's next turn.
 
         IMPORTANT: Choose a VALID move based ONLY on the board state and rules above.
@@ -836,7 +806,6 @@ namespace AI {
             return prompt.trim();
         }
 
-        // Updated parser for optional WELL_TARGET
         private parseAIResponse(responseText: string): GameTypes.AIParsedResponse | null {
             const lines = responseText.trim().toUpperCase().split('\n');
             const mainActionLine = lines[0];
@@ -881,17 +850,13 @@ namespace AI {
             const url = `${GameConstants.GEMINI_API_ENDPOINT}?key=${this.apiKey}`;
             const requestBody = {
                 contents: [{ parts: [{ text: prompt }] }],
-                 // Add safety settings if needed, consult Gemini documentation
-                // safetySettings: [ ... ],
-                 generationConfig: { // Optional: control output randomness etc.
-                     temperature: 0.7, // Adjust for creativity vs consistency
-                     // topP: 0.9,
-                     // topK: 40,
+                 generationConfig: {
+                     temperature: 0.7,
                  }
             };
 
             try {
-                const response = await fetch(url, { // Make sure fetch is imported
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(requestBody),
@@ -905,7 +870,6 @@ namespace AI {
                 }
 
                 const data = await response.json() as any;
-                // Updated path based on Gemini API structure
                 const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
                 if (typeof text !== 'string') {
@@ -940,14 +904,13 @@ namespace AI {
             while (attempts <= GameConstants.AI_MAX_RETRIES && !parsedResponse) {
                 if (attempts > 0) {
                      console.log(`Attempt ${attempts + 1} to get AI move...`);
-                     await GameUtils.sleep(500); // Wait before retrying
+                     await GameUtils.sleep(500);
                 }
                 const responseText = await this.callGeminiAPI(prompt);
 
                 if (responseText) {
                     parsedResponse = this.parseAIResponse(responseText);
                     if (parsedResponse) {
-                        // Basic validation of the AI's choices
                          const targetCoordStr = GameUtils.toCoordinateString(parsedResponse.coord);
                          const targetCellState = grid.getCell(parsedResponse.coord);
                          const targetSpecial = specials[targetCoordStr];
@@ -958,8 +921,6 @@ namespace AI {
                          switch (parsedResponse.action) {
                              case 'CONQUER':
                                  if (targetCellState !== ' ') { isValid = false; errorMsg = "CONQUER target not empty"; }
-                                 // Removed restriction on conquering empty ∆/✶ based on previous change allowing it for ⛨
-                                 // if (targetSpecial && targetSpecial !== '⛨') { isValid = false; errorMsg = "CONQUER target has non-shield special"; }
                                  if (!rules.isAdjacent(parsedResponse.coord, aiPlayer)) { isValid = false; errorMsg = "CONQUER target not adjacent"; }
                                  break;
                              case 'FORTIFY':
@@ -972,16 +933,15 @@ namespace AI {
                                  break;
                          }
 
-                         // Validate Magic Well Target if provided
                          if (parsedResponse.magicWellTargetCoord) {
                              if (!aiPlayer.ownsAnyMagicWell()) {
                                  console.warn("AI provided WELL_TARGET but owns no Magic Wells. Ignoring target.");
-                                 parsedResponse.magicWellTargetCoord = undefined; // Clear invalid target
+                                 parsedResponse.magicWellTargetCoord = undefined;
                              } else {
                                  const wellTargetStr = GameUtils.toCoordinateString(parsedResponse.magicWellTargetCoord);
                                  if (!aiPlayer.ownsPosition(wellTargetStr)) {
                                      console.warn(`AI provided invalid WELL_TARGET ${GameUtils.formatCoordForUser(parsedResponse.magicWellTargetCoord)} (not owned). Ignoring target.`);
-                                     parsedResponse.magicWellTargetCoord = undefined; // Clear invalid target
+                                     parsedResponse.magicWellTargetCoord = undefined;
                                  }
                              }
                          }
@@ -989,32 +949,29 @@ namespace AI {
 
                          if (!isValid) {
                              console.warn(`AI suggested invalid move: ${parsedResponse.action} ${GameUtils.formatCoordForUser(parsedResponse.coord)} (${errorMsg}). Retrying...`);
-                             parsedResponse = null; // Force retry
+                             parsedResponse = null;
                          }
 
                     }
                 } else {
                     console.error("Communication failure with Gemini API.");
-                    // Don't break immediately, allow retries
                 }
                 attempts++;
-            } // End retry loop
+            }
 
-            // --- Fallback Logic ---
             if (!parsedResponse) {
                 console.error("AI failed to provide a valid move after multiple attempts.");
                 const validMoves = rules.getValidMoves(aiPlayer, humanPlayer, grid, specials);
                 const fallbackMove = GameUtils.getRandomElement(validMoves);
                  if (fallbackMove) {
                      console.log("Using random valid move as fallback.");
-                     parsedResponse = fallbackMove; // Use the random move structure
+                     parsedResponse = fallbackMove;
                  } else {
                      console.error("No valid moves found for AI (fallback failed).");
-                     return null; // AI cannot move
+                     return null;
                  }
             }
 
-            // --- Finalize Magic Well Target (if fallback or AI didn't choose) ---
             if (aiPlayer.ownsAnyMagicWell() && !parsedResponse.magicWellTargetCoord) {
                 const validTargets = rules.getValidMagicWellTargets(aiPlayer);
                 const randomTarget = GameUtils.getRandomElement(validTargets);
@@ -1024,7 +981,7 @@ namespace AI {
                 }
             }
 
-            return parsedResponse; // Return the validated/fallback move
+            return parsedResponse;
         }
     }
 }
@@ -1038,7 +995,7 @@ namespace Game {
         private aiLogic: GameInterfaces.IAILogic | null = null;
 
         private currentPlayerId: GameTypes.PlayerId;
-        private specials: GameTypes.SpecialCellsMap; // Tracks only specials ON THE BOARD
+        private specials: GameTypes.SpecialCellsMap;
         private isGameOver: boolean;
         private gameMode: GameTypes.GameMode = 'PvP';
 
@@ -1051,7 +1008,7 @@ namespace Game {
             this.ui = new UI.TerminalUI();
             this.rules = new Rules.GameRules();
             this.currentPlayerId = 0;
-            this.specials = {}; // Map of CoordinateString -> SpecialType
+            this.specials = {};
             this.isGameOver = false;
         }
 
@@ -1060,7 +1017,6 @@ namespace Game {
 
              if (this.gameMode === 'PvE') {
                  if (!GameConstants.GEMINI_API_KEY) {
-                     // Message already handled in promptGameMode
                      return false;
                  }
                  try {
@@ -1080,11 +1036,9 @@ namespace Game {
         }
 
         private setupInitialState(): void {
-            // Initial player positions - claimCell handles adding to player object too
             this.claimCell({ row: 0, col: 0 }, 0);
             this.claimCell({ row: GameConstants.GRID_SIZE - 1, col: GameConstants.GRID_SIZE - 1 }, 1);
 
-            // Place initial specials (∆, ✶, ⛨) randomly on empty cells
             let specialsPlaced = 0;
             const maxPlacementAttempts = GameConstants.GRID_SIZE * GameConstants.GRID_SIZE * 2;
             let attempts = 0;
@@ -1097,14 +1051,12 @@ namespace Game {
 
             while (specialsPlaced < GameConstants.INITIAL_SPECIAL_CELLS && attempts < maxPlacementAttempts && potentialCoords.length > 0) {
                  const randIndex = GameUtils.randomInt(0, potentialCoords.length - 1);
-                 const coord = potentialCoords.splice(randIndex, 1)[0]; // Pick and remove
+                 const coord = potentialCoords.splice(randIndex, 1)[0];
                  const coordStr = GameUtils.toCoordinateString(coord);
 
-                 // Ensure cell is empty and not player start
                  if (this.grid.getCell(coord) === ' ' && !this.specials[coordStr]) {
-                    // Cycle through special types for variety
                     const specialType = GameConstants.SPECIAL_TYPES[specialsPlaced % GameConstants.SPECIAL_TYPES.length];
-                    this.specials[coordStr] = specialType; // Add to board specials map
+                    this.specials[coordStr] = specialType;
                     specialsPlaced++;
                  }
                  attempts++;
@@ -1120,7 +1072,6 @@ namespace Game {
             this.ui.displayMessage("Good luck, Lords!\n");
         }
 
-        // Simplified claimCell - only updates grid and player positions
         private claimCell(coord: GameTypes.Coordinate, playerId: GameTypes.PlayerId): void {
             const player = this.players[playerId];
             const coordStr = GameUtils.toCoordinateString(coord);
@@ -1142,13 +1093,11 @@ namespace Game {
                 if (!this.isGameOver) {
                     this.switchPlayer();
                 } else {
-                     // Display final board state on game over before victory message
                      this.ui.clearScreen();
                      this.ui.renderBoard(this.grid, this.specials, this.magicWellBonusTarget);
                 }
             }
 
-            // Winner already determined in checkGameOver loop end
             const winnerId = this.rules.checkWinner(this.players);
             const winnerMark = winnerId !== null ? this.players[winnerId].mark : null;
             this.ui.displayVictory(winnerMark);
@@ -1156,20 +1105,16 @@ namespace Game {
         }
 
         private async executePlayerTurn(): Promise<void> {
-            // --- Start of Turn ---
             const currentPlayer = this.players[this.currentPlayerId];
             const opponentPlayer = this.players[this.currentPlayerId === 0 ? 1 : 0];
             const isAITurn = this.gameMode === 'PvE' && currentPlayer.id === GameConstants.AI_PLAYER_ID && this.aiLogic;
 
-            // Reset Magic Well bonus from PREVIOUS turn before showing board
             this.magicWellBonusTarget = null;
             this.magicWellBonusActiveForPlayerId = null;
 
-            // --- Display Board ---
             this.ui.clearScreen();
-            this.ui.renderBoard(this.grid, this.specials, this.magicWellBonusTarget); // Show board without bonus initially
+            this.ui.renderBoard(this.grid, this.specials, this.magicWellBonusTarget);
 
-            // --- Get Player/AI Action ---
             let moveSuccessful = false;
             if (isAITurn) {
                 moveSuccessful = await this.executeAITurn(currentPlayer);
@@ -1177,47 +1122,34 @@ namespace Game {
                 moveSuccessful = await this.executeHumanTurn(currentPlayer);
             }
 
-            // --- Post-Action: Magic Well Activation ---
             if (moveSuccessful && currentPlayer.ownsAnyMagicWell()) {
                 const validTargets = this.rules.getValidMagicWellTargets(currentPlayer);
                 let chosenTargetCoord: GameTypes.Coordinate | null = null;
 
                 if (isAITurn) {
-                    // AI move should already contain the target if decided
-                    // (Validation happened in decideMove)
-                    // We trust the decideMove logic returned a valid owned cell or null
-                    const aiMove = (this.lastAIMoveResult); // Need to store result from executeAITurn
+                    const aiMove = (this.lastAIMoveResult);
                     if (aiMove?.magicWellTargetCoord) {
                         chosenTargetCoord = aiMove.magicWellTargetCoord;
-                        // UI message already displayed in displayAIMove if target was chosen
                     } else if (validTargets.length > 0) {
-                         // Should have been handled by fallback in decideMove, but double check
                          console.warn("AI owns Magic Well but no target decided/fallback failed. Skipping bonus.");
                     }
                 } else {
-                     // Prompt human player
                      chosenTargetCoord = await this.ui.promptMagicWellTarget(currentPlayer, validTargets);
                 }
 
                 if (chosenTargetCoord) {
                     this.magicWellBonusTarget = GameUtils.toCoordinateString(chosenTargetCoord);
-                    this.magicWellBonusActiveForPlayerId = opponentPlayer.id; // Bonus active for opponent's turn
-                    // Re-render board briefly to show bonus marker? Optional.
-                     // this.ui.clearScreen();
-                     // this.ui.renderBoard(this.grid, this.specials, this.magicWellBonusTarget);
-                     // await GameUtils.sleep(1500);
+                    this.magicWellBonusActiveForPlayerId = opponentPlayer.id;
                 }
             }
-             await GameUtils.sleep(1500); // Pause after turn actions/messages
+             await GameUtils.sleep(1500);
         }
 
-        // Store AI move result to access Magic Well target later
         private lastAIMoveResult: GameTypes.AIMove | null = null;
 
         private async executeHumanTurn(player: GameInterfaces.IPlayer): Promise<boolean> {
              let actionIsValidAndExecuted = false;
              while (!actionIsValidAndExecuted) {
-                 // Re-render needed if input was invalid
                  this.ui.clearScreen();
                  this.ui.renderBoard(this.grid, this.specials, this.magicWellBonusTarget);
 
@@ -1231,21 +1163,20 @@ namespace Game {
                  actionIsValidAndExecuted = this.processPlayerAction(player, moveInput.action, moveInput.coord);
 
                  if (!actionIsValidAndExecuted) {
-                      // Error message displayed within validateAndExecute functions
                       await this.ui.askQuestion("Action failed or was invalid. Press Enter to try again...");
                  }
              }
-             return actionIsValidAndExecuted; // Return true if successful action processed
+             return actionIsValidAndExecuted;
         }
 
         private async executeAITurn(aiPlayer: GameInterfaces.IPlayer): Promise<boolean> {
              this.ui.displayAIThinking();
              const humanPlayer = this.players[aiPlayer.id === 0 ? 1 : 0];
-             this.lastAIMoveResult = null; // Reset before getting new move
+             this.lastAIMoveResult = null;
 
              if (!this.aiLogic) {
                  this.ui.displayAIError("AI logic is not available!");
-                 return false; // Move failed
+                 return false;
              }
 
              const aiMove = await this.aiLogic.decideMove(aiPlayer, humanPlayer, this.grid, this.specials, this.rules);
@@ -1253,24 +1184,22 @@ namespace Game {
              if (!aiMove) {
                  this.ui.displayAIError("Could not determine a move.");
                  await GameUtils.sleep(1500);
-                 return false; // Move failed
+                 return false;
              }
 
-             this.lastAIMoveResult = aiMove; // Store the result for Magic Well check later
-             this.ui.displayAIMove(aiPlayer.mark, aiMove); // Display main action + potential well target
+             this.lastAIMoveResult = aiMove;
+             this.ui.displayAIMove(aiPlayer.mark, aiMove);
              await GameUtils.sleep(1500);
 
              const success = this.processPlayerAction(aiPlayer, aiMove.action, aiMove.coord);
 
              if (!success) {
-                 // This *shouldn't* happen if decideMove validation is good, but handle defensively
                  this.ui.displayAIError(`AI's chosen action (${aiMove.action}: ${GameUtils.formatCoordForUser(aiMove.coord)}) failed validation.`);
                  await GameUtils.sleep(1500);
              }
              return success;
         }
 
-        // Central processing function for any player's action
         private processPlayerAction(player: GameInterfaces.IPlayer, action: GameTypes.AIActionType, coord: GameTypes.Coordinate): boolean {
              switch (action) {
                  case 'CONQUER':
@@ -1305,21 +1234,20 @@ namespace Game {
            if (existingSpecial) {
                if (existingSpecial === '⛨') {
                    this.ui.displayMessage(`Player ${player.mark} conquered shielded cell ${GameUtils.formatCoordForUser(targetCoord)}! Shield remains.`);
-                   // Shield remains in this.specials
                } else if (existingSpecial === '∆') {
                    this.ui.displayMessage(`Player ${player.mark} conquered and captured Power Source ∆ at ${GameUtils.formatCoordForUser(targetCoord)}! (+1 Attack Bonus)`);
-                   delete this.specials[targetCoordStr]; // Remove from board map
-                   player.addPowerSource(targetCoordStr); // Add to player
+                   delete this.specials[targetCoordStr];
+                   player.addPowerSource(targetCoordStr);
                } else if (existingSpecial === '✶') {
                    this.ui.displayMessage(`Player ${player.mark} conquered and captured Magic Well ✶ at ${GameUtils.formatCoordForUser(targetCoord)}! (Defense Bonus ability)`);
-                   delete this.specials[targetCoordStr]; // Remove from board map
-                   player.addMagicWell(targetCoordStr); // Add to player
+                   delete this.specials[targetCoordStr];
+                   player.addMagicWell(targetCoordStr);
                }
            } else {
                this.ui.displayMessage(`Player ${player.mark} conquered ${GameUtils.formatCoordForUser(targetCoord)}!`);
            }
 
-           this.claimCell(targetCoord, player.id); // Assign cell ownership
+           this.claimCell(targetCoord, player.id);
            return true;
        }
 
@@ -1339,14 +1267,13 @@ namespace Game {
 
            const existingSpecial = this.specials[targetCoordStr];
            if (existingSpecial) {
-                // Fortifying removes existing ∆ or ✶ from the cell AND the player
                 this.ui.displayMessage(`Warning: Fortifying removes the existing ${existingSpecial} at ${GameUtils.formatCoordForUser(targetCoord)}.`);
                 if (existingSpecial === '∆') player.removePowerSource(targetCoordStr);
                 if (existingSpecial === '✶') player.removeMagicWell(targetCoordStr);
-                delete this.specials[targetCoordStr]; // Remove from board map
+                delete this.specials[targetCoordStr];
            }
 
-           this.specials[targetCoordStr] = '⛨'; // Add shield to board map
+           this.specials[targetCoordStr] = '⛨';
            this.ui.displayMessage(`Player ${player.mark} fortified ${GameUtils.formatCoordForUser(targetCoord)} with ⛨!`);
            return true;
        }
@@ -1369,47 +1296,41 @@ namespace Game {
            const defenderSpecial = this.specials[targetCoordStr];
            const isDefenderShielded = defenderSpecial === '⛨';
 
-           // Check if the magic well bonus is active for THIS defender on THIS cell
            const isMagicWellBoosted = this.magicWellBonusActiveForPlayerId === opponent.id &&
                                      this.magicWellBonusTarget === targetCoordStr;
 
-           // Roll dice with bonuses
            const attackRoll = this.rules.rollAttackDice(player);
            const defenseRoll = this.rules.rollDefenseDice(opponent, targetCoord, isDefenderShielded, isMagicWellBoosted ? targetCoordStr : null);
            const attackSuccessful = attackRoll > defenseRoll;
 
-           // Display result BEFORE processing changes
            this.ui.displayAttackResult(player.mark, opponent.mark, attackRoll, defenseRoll, attackSuccessful);
 
            if (attackSuccessful) {
-               // --- Capture Logic ---
-               opponent.removePosition(targetCoordStr); // Remove from defender first
+               opponent.removePosition(targetCoordStr);
 
-               // Handle defender's specials on the lost cell
                if (defenderSpecial) {
                    if (defenderSpecial === '⛨') {
                        this.ui.displayMessage(`Defender's Shield ⛨ at ${GameUtils.formatCoordForUser(targetCoord)} was destroyed!`);
-                       delete this.specials[targetCoordStr]; // Remove shield from board
+                       delete this.specials[targetCoordStr];
                    } else if (defenderSpecial === '∆') {
                        this.ui.displayMessage(`Player ${player.mark} captured opponent's Power Source ∆ at ${GameUtils.formatCoordForUser(targetCoord)}!`);
-                       opponent.removePowerSource(targetCoordStr); // Remove from opponent
-                       delete this.specials[targetCoordStr];     // Remove from board
-                       player.addPowerSource(targetCoordStr);     // Add to attacker
+                       opponent.removePowerSource(targetCoordStr);
+                       delete this.specials[targetCoordStr];
+                       player.addPowerSource(targetCoordStr);
                    } else if (defenderSpecial === '✶') {
                         this.ui.displayMessage(`Player ${player.mark} captured opponent's Magic Well ✶ at ${GameUtils.formatCoordForUser(targetCoord)}!`);
-                        opponent.removeMagicWell(targetCoordStr);  // Remove from opponent
-                        delete this.specials[targetCoordStr];      // Remove from board
-                        player.addMagicWell(targetCoordStr);       // Add to attacker
+                        opponent.removeMagicWell(targetCoordStr);
+                        delete this.specials[targetCoordStr];
+                        player.addMagicWell(targetCoordStr);
                    }
                }
 
-               this.claimCell(targetCoord, player.id); // Attacker claims the cell
+               this.claimCell(targetCoord, player.id);
                this.ui.displayMessage(`Player ${player.mark} successfully captured ${GameUtils.formatCoordForUser(targetCoord)}!`);
 
            } else {
-                // Attack failed - nothing changes on board or with specials
            }
-           return true; // Attack action was processed (even if failed)
+           return true;
        }
 
 
@@ -1422,7 +1343,6 @@ namespace Game {
             if (winnerId !== null) {
                 this.isGameOver = true;
             }
-            // TODO: Add stalemate condition? (e.g., no valid moves for current player)
         }
     }
 }
